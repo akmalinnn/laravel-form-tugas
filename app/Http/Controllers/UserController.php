@@ -9,10 +9,17 @@ use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
 {
     public function index()
-    {
-        $users = User::query()->latest()->paginate(10);
 
-        return view('user.index',compact('users'));
+    {
+        $users = Cache::remember('users', now()->addMinutes(10), function () {
+            return User::query()->latest()->paginate(10);
+        });
+
+        return view('user.index', compact('users'));
+
+        // $users = User::query()->latest()->paginate(10);
+
+        // return view('user.index',compact('users'));
     }
 
     public function create()
